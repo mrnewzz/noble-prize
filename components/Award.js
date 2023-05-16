@@ -11,7 +11,7 @@ function Award({ nobel }) {
             return (
               <h4 key={index}>
                 {" "}
-                แรงบรรดาลใจ {index + 1} : {m.motivation.en}{" "}
+                แรงบรรดาลใจ {index + 1} : {m.motivation.en}
               </h4>
             );
           })}

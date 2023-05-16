@@ -2,6 +2,8 @@ import "../styles/globals.css";
 import Head from "../layout/Header";
 import { useState, useEffect } from "react";
 import Award from "../components/Award";
+import Button from "@mui/material/Button";
+import Pagination from "@mui/material/Pagination";
 import Header from "next/head";
 
 function MyApp() {
@@ -10,6 +12,9 @@ function MyApp() {
   const [nobel, setNobel] = useState([]);
   const [yearOption, setOption] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [pageList, setPage] = useState("");
+  const [onPage, setOnPage] = useState(1);
+  const [offset, setOffset] = useState(0);
 
   async function changeYear(val) {
     setCopyYear(val);
@@ -17,11 +22,31 @@ function MyApp() {
 
   async function filterData() {
     setYear(copyYear);
+    setOnPage(1);
     fetchNobel();
   }
 
   async function fetchNobel() {
-    const url = `https://api.nobelprize.org/2.1/nobelPrizes?limit=5&nobelPrizeYear=${copyYear}`;
+    const limit = 5;
+    const url = `https://api.nobelprize.org/2.1/nobelPrizes?limit=${limit}&nobelPrizeYear=${copyYear}&offset=0`;
+    const response = await fetch(url);
+    const data = await response.json();
+    setNobel(data);
+    const countPage = data.meta.count / limit;
+    setPage(Math.round(countPage));
+    setIsLoading(false);
+  }
+
+  async function pageChange(event, page) {
+    const offsetDetault = 5
+    const countPage = page > onPage ? page - onPage : onPage - page
+    const checkPoint = countPage * offsetDetault
+    const summary = page > onPage ? checkPoint + offset : checkPoint - offset
+    setOffset(summary);
+    setOnPage(page);
+    setIsLoading(true);
+    const limit = 5;
+    const url = `https://api.nobelprize.org/2.1/nobelPrizes?limit=${limit}&nobelPrizeYear=${copyYear}&offset=${summary}`;
     const response = await fetch(url);
     const data = await response.json();
     setNobel(data);
@@ -29,7 +54,6 @@ function MyApp() {
   }
 
   useEffect(() => {
-
     async function fetchYear() {
       const minYear = 1901;
       const maxYear = 2023;
@@ -49,7 +73,7 @@ function MyApp() {
   }
 
   if (nobel.nobelPrizes.length === 0) {
-    return <h2>ไม่พบข้อมูล</h2>
+    return <h2>ไม่พบข้อมูล</h2>;
   }
 
   return (
@@ -83,13 +107,14 @@ function MyApp() {
               })}
             </select>
 
-            <button
-              type="button"
-              className="btn btn-sm mt-2 btn-outline-secondary"
+            <Button
+              className="mt-2"
+              size="small"
+              variant="outlined"
               onClick={filterData}
             >
               Apply Filter
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -104,35 +129,9 @@ function MyApp() {
             })}
           </div>
 
-          <nav className="mt-2">
-            <ul className="pagination pagination-sm">
-              <li className="page-item">
-                <a className="page-link" href="#">
-                  Previous
-                </a>
-              </li>
-              <li className="page-item">
-                <a className="page-link" href="#">
-                  1
-                </a>
-              </li>
-              <li className="page-item">
-                <a className="page-link" href="#">
-                  2
-                </a>
-              </li>
-              <li className="page-item">
-                <a className="page-link" href="#">
-                  3
-                </a>
-              </li>
-              <li className="page-item">
-                <a className="page-link" href="#">
-                  Next
-                </a>
-              </li>
-            </ul>
-          </nav>
+          <div>
+            <Pagination count={pageList} page={onPage} onChange={pageChange} variant="outlined" shape="rounded" />
+          </div>
         </div>
       </div>
     </div>

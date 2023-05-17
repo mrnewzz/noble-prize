@@ -38,10 +38,10 @@ function MyApp() {
   }
 
   async function pageChange(event, page) {
-    const offsetDetault = 5
-    const countPage = page > onPage ? page - onPage : onPage - page
-    const checkPoint = countPage * offsetDetault
-    const summary = page > onPage ? checkPoint + offset : checkPoint - offset
+    const offsetDetault = 5;
+    const countPage = page > onPage ? page - onPage : onPage - page;
+    const checkPoint = countPage * offsetDetault;
+    const summary = page > onPage ? checkPoint + offset : checkPoint - offset;
     setOffset(summary);
     setOnPage(page);
     setIsLoading(true);
@@ -120,17 +120,29 @@ function MyApp() {
 
         <div className="grid-item2">
           <div>
-            {nobel.nobelPrizes.map((val, index) => {
-              return (
-                <div key={index}>
-                  <Award nobel={val} />
-                </div>
-              );
-            })}
+            {nobel.nobelPrizes.length === 0 ? (
+              <>ไม่พบรายการ</>
+            ) : (
+              <>
+                {nobel.nobelPrizes.map((val, index) => {
+                  return (
+                    <div key={index}>
+                      <Award nobel={val} />
+                    </div>
+                  );
+                })}
+              </>
+            )}
           </div>
 
           <div>
-            <Pagination count={pageList} page={onPage} onChange={pageChange} variant="outlined" shape="rounded" />
+            <Pagination
+              count={pageList}
+              page={onPage}
+              onChange={pageChange}
+              variant="outlined"
+              shape="rounded"
+            />
           </div>
         </div>
       </div>
